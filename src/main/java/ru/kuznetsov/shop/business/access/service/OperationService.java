@@ -1,154 +1,96 @@
 package ru.kuznetsov.shop.business.access.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.kuznetsov.shop.business.access.enums.OperationType;
-import ru.kuznetsov.shop.represent.dto.AbstractDto;
+import org.springframework.web.reactive.function.client.WebClient;
+import ru.kuznetsov.shop.business.access.connector.WebClientConnector;
+import ru.kuznetsov.shop.represent.contract.OperationContract;
+import ru.kuznetsov.shop.represent.dto.OperationDto;
+import ru.kuznetsov.shop.represent.dto.OperationPayloadDto;
+import ru.kuznetsov.shop.represent.enums.OperationType;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static ru.kuznetsov.shop.business.access.enums.OperationType.SAVE;
-
+import static ru.kuznetsov.shop.business.access.common.ConstValues.OPERATION_MODULE;
 
 @Service
-public class OperationService {
+public class OperationService implements OperationContract {
 
-    @Value("${operation.timeout}")
-    private long waitingForOperationTime;
+    protected final WebClientConnector connector;
 
-    @Getter
-    private final Map<Operation, List<OperationDataContainer>> operations = new HashMap<>();
+    public OperationService(@Qualifier("operation") WebClient webclient) {
+        this.connector = new WebClientConnector(webclient);
+    }
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    Logger logger = LoggerFactory.getLogger(OperationService.class);
-
+    @Override
     public boolean containsOperation(String operationId) {
-        return operations.keySet().stream()
-                .map(Operation::getId)
-                .anyMatch(operationId::equals);
+        return connector.sendGetRequest(OPERATION_MODULE + "/" + operationId + "/contains",
+                null,
+                null,
+                Boolean.class).get(0);
     }
 
-    public Optional<Operation> getOperation(String operationId) {
-        return operations.keySet().stream()
-                .filter(operation -> operation.getId().equals(operationId))
-                .findFirst();
+    @Override
+    public OperationDto getOperation(String operationId) {
+        return connector.sendGetRequest(OPERATION_MODULE + "/" + operationId,
+                null,
+                null,
+                OperationDto.class).get(0);
     }
 
-    public List<OperationDataContainer> getOperationData(Operation operation) {
-        return operations.get(operation);
+    @Override
+    public List<OperationPayloadDto> getOperationData(String operationId) {
+        return connector.sendGetRequest(OPERATION_MODULE + "/payload/" + operationId,
+                null,
+                null,
+                OperationPayloadDto.class);
     }
 
-    public void removeOperations(List<Operation> operationIds) {
-        for (Operation operation : operationIds) {
-            removeOperation(operation);
-        }
+    @Override
+    public List<OperationPayloadDto> getOperationData(OperationDto operation) {
+        return connector.sendPostRequest(OPERATION_MODULE + "/payload",
+                null,
+                operation,
+                OperationPayloadDto.class);
     }
 
-    public void removeOperation(Operation operation) {
-        operations.remove(operation);
+    @Override
+    public void removeOperations(List<OperationDto> operationIds) {
+        connector.sendDeleteRequest(OPERATION_MODULE + "/batch",
+                null,
+                operationIds,
+                void.class);
     }
 
-    public <E extends AbstractDto> void putToSuccessfulOperations(String objectJson,
-                                                                  byte[] operationId,
-                                                                  Class<E> clazz,
-                                                                  OperationType type) {
-        logger.info("Adding {} to successfully save operation with operationId: {}", objectJson, operationId);
-
-        putOperationToMap(objectJson, operationId, clazz, type, 1);
+    @Override
+    public void removeOperation(OperationDto operation) {
+        connector.sendDeleteRequest(OPERATION_MODULE,
+                null,
+                operation,
+                void.class);
     }
 
-    public <E extends AbstractDto> void putToFailedOperations(String objectJson,
-                                                              byte[] operationId,
-                                                              Class<E> clazz,
-                                                              OperationType type) {
-        logger.info("Adding {} to failed save operation with operationId: {}", objectJson, operationId);
+    @Override
+    public void addOperations(String objectJson, String operationId, OperationType operationType, int result) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("objectJson", objectJson);
+        requestMap.put("operationId", operationId);
+        requestMap.put("operationType", operationType);
+        requestMap.put("result", result);
 
-        putOperationToMap(objectJson, operationId, clazz, type, 0);
+        connector.sendPostRequest(OPERATION_MODULE + "/payload",
+                null,
+                requestMap,
+                OperationPayloadDto.class);
     }
 
-
-    private <E extends AbstractDto> void putOperationToMap(
-            String objectJson,
-            byte[] operationId,
-            Class<E> clazz,
-            OperationType type,
-            int result) {
-
-        String operationIdDecoded = new String(operationId);
-
-        try {
-            Long id = objectMapper.readValue(objectJson, clazz).getId();
-            Operation operation = new Operation(operationIdDecoded, type, result);
-            OperationDataContainer container = new OperationDataContainer(id, LocalDateTime.now());
-
-            if (operations.containsKey(operation)) {
-                operations.get(operation).add(container);
-            } else {
-                List<OperationDataContainer> containers = new ArrayList<>();
-                containers.add(container);
-                operations.put(operation, containers);
-            }
-        } catch (JsonProcessingException e) {
-            logger.error(e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void removeOldOperations() {
-        for (Map.Entry<Operation, List<OperationDataContainer>> entry : operations.entrySet()) {
-            entry.getValue().stream()
-                    .max(Comparator.comparing(OperationDataContainer::getDateTime))
-                    .ifPresent(container -> {
-                        if (container.getDateTime().isBefore(LocalDateTime.now().minusHours(1))) {
-                            removeOperation(entry.getKey());
-                        }
-                    });
-        }
-    }
-
+    @Override
     public List<Long> getEntityIdsByOperationId(String operationId) {
-        CompletableFuture<Operation> operationWithData = waitForOperation(operationId);
-        List<Long> entityIds;
-
-        try {
-            Operation operation = operationWithData.orTimeout(waitingForOperationTime, TimeUnit.SECONDS).get();
-            List<OperationDataContainer> operationData = getOperationData(operation);
-            OperationType operationType = operation.getType();
-            int result = operation.getResult();
-
-            if (operationType != SAVE)
-                throw new RuntimeException("Invalid operation type received for operation " + operationId);
-            if (result != 1) throw new RuntimeException("Operation is not success. Id " + operationId);
-
-            entityIds = operationData.stream()
-                    .map(OperationDataContainer::getPayloadId)
-                    .toList();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-
-        return entityIds;
-    }
-
-    private CompletableFuture<Operation> waitForOperation(String operationId) {
-        return CompletableFuture.supplyAsync(() -> {
-            while ((!containsOperation(operationId))) {
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            return getOperation(operationId).orElseThrow(() -> new RuntimeException("Operation with id " + operationId + " not found"));
-        });
+        return connector.sendPostRequest(OPERATION_MODULE + "/payload/" + operationId + "/wait",
+                null,
+                null,
+                Long.class);
     }
 }

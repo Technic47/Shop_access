@@ -31,11 +31,11 @@ public class StoreContractImpl extends AbstractContractImpl<StoreDto> implements
         if (name != null && !name.isEmpty()) params.put("name", name);
         if (addressId != null) params.put("addressId", addressId);
 
-        return sendGetRequest(getModuleName(), params, null, StoreDto.class);
+        return connector.sendGetRequest(getModuleName(), params, null, StoreDto.class);
     }
 
     @Override
     public List<StockDto> getAllStockByStoreId(Long storeId) {
-        return sendGetRequest(getModuleName() + "/" + storeId + "/stock", null, null, StockDto.class);
+        return connector.sendGetRequest(getModuleName() + "/" + storeId + "/stock", null, null, StockDto.class);
     }
 }

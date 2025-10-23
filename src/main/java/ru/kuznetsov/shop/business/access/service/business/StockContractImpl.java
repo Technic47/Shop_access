@@ -29,18 +29,18 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
 
     @Override
     public Collection<StockDto> getAllByStoreId(Long storeId) {
-        return sendGetRequest(getModuleName() + "/store", null, null, StockDto.class);
+        return connector.sendGetRequest(getModuleName() + "/store", null, null, StockDto.class);
     }
 
     @Override
     public Collection<StockDto> getAllByProductId(Long productId) {
-        return sendGetRequest(getModuleName() + "/product", null, null, StockDto.class);
+        return connector.sendGetRequest(getModuleName() + "/product", null, null, StockDto.class);
     }
 
 
     @Override
     public StockDto create(StockDto entity) {
-        String operationId = sendPostRequest(getModuleName(), null, entity, String.class).get(0);
+        String operationId = connector.sendPostRequest(getModuleName(), null, entity, String.class).get(0);
         Long entityId = operationService.getEntityIdsByOperationId(operationId).get(0);
 
         return getById(entityId);
@@ -48,7 +48,7 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
 
     @Override
     public Collection<StockDto> createBatch(Collection<StockDto> entities) {
-        String operationId = sendPostRequest(getModuleName() + "/batch", null, entities, String.class).get(0);
+        String operationId = connector.sendPostRequest(getModuleName() + "/batch", null, entities, String.class).get(0);
         return operationService.getEntityIdsByOperationId(operationId)
                 .stream()
                 .map(this::getById)

@@ -13,7 +13,7 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.*;
 
 @Configuration
 @ComponentScan("ru.kuznetsov.shop.business.access")
-public class DataAccess {
+public class DataAccessConfig {
 
     @Value("${microservices.baseUrl}")
     private String baseUrl;
@@ -46,6 +46,12 @@ public class DataAccess {
     @Qualifier("store")
     public WebClient getStoreClient() {
         return getWebClient(STORE_PORT);
+    }
+
+    @Bean
+    @Qualifier("operation")
+    public WebClient getOperationClient() {
+        return getWebClient(OPERATION_PORT);
     }
 
     private WebClient getWebClient(String port){
