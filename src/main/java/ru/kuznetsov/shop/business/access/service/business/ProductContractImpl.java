@@ -8,6 +8,7 @@ import ru.kuznetsov.shop.represent.contract.business.ProductContract;
 import ru.kuznetsov.shop.represent.dto.ProductDto;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.PRODUCT_MODULE;
 
@@ -28,7 +29,7 @@ public class ProductContractImpl extends AbstractContractImpl<ProductDto> implem
 
     @Override
     public ProductDto create(ProductDto entity) {
-        String operationId = connector.sendPostRequest(getModuleName(), null, entity, String.class).get(0);
+        String operationId = connector.sendPostRequest(getModuleName(), new HashMap<>(), entity, String.class).get(0);
         Long entityId = operationService.getEntityIdsByOperationId(operationId).get(0);
 
         return getById(entityId);
@@ -36,7 +37,7 @@ public class ProductContractImpl extends AbstractContractImpl<ProductDto> implem
 
     @Override
     public Collection<ProductDto> createBatch(Collection<ProductDto> entities) {
-        String operationId = connector.sendPostRequest(getModuleName() + "/batch", null, entities, String.class).get(0);
+        String operationId = connector.sendPostRequest(getModuleName() + "/batch", new HashMap<>(), entities, String.class).get(0);
         return operationService.getEntityIdsByOperationId(operationId)
                 .stream()
                 .map(this::getById)

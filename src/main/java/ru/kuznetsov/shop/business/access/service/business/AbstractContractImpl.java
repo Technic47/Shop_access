@@ -7,6 +7,7 @@ import ru.kuznetsov.shop.represent.dto.AbstractDto;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class AbstractContractImpl<E extends AbstractDto> implements AbstractContract<E> {
@@ -24,22 +25,22 @@ public abstract class AbstractContractImpl<E extends AbstractDto> implements Abs
 
     @Override
     public E getById(Long id) {
-        return connector.sendGetRequest(getModuleName() + "/" + id, null, null, clazz).get(0);
+        return connector.sendGetRequest(getModuleName() + "/" + id, new HashMap<>(), null, clazz).get(0);
     }
 
     @Override
     public List<E> getAll() {
-        return connector.sendGetRequest(getModuleName(), null, null, clazz);
+        return connector.sendGetRequest(getModuleName(), new HashMap<>(), null, clazz);
     }
 
     @Override
     public E create(E entity) {
-        return connector.sendPostRequest(getModuleName(), null, entity, clazz).get(0);
+        return connector.sendPostRequest(getModuleName(), new HashMap<>(), entity, clazz).get(0);
     }
 
     @Override
     public Collection<E> createBatch(Collection<E> entities) {
-        return connector.sendPostRequest(getModuleName() + "/batch", null, entities, clazz);
+        return connector.sendPostRequest(getModuleName() + "/batch", new HashMap<>(), entities, clazz);
     }
 
     @Override
@@ -49,6 +50,6 @@ public abstract class AbstractContractImpl<E extends AbstractDto> implements Abs
 
     @Override
     public void delete(Long id) {
-        connector.sendDeleteRequest(getModuleName() + "/" + id, null, null, clazz);
+        connector.sendDeleteRequest(getModuleName() + "/" + id, new HashMap<>(), null, clazz);
     }
 }

@@ -46,8 +46,10 @@ public class WebClientConnector {
         Mono<List<T>> mono = webClient.method(method)
                 .uri(uriBuilder -> {
                     uriBuilder.path(uri);
-                    for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
-                        uriBuilder.queryParam(entry.getKey(), entry.getValue());
+                    if(queryParams != null) {
+                        for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
+                            uriBuilder.queryParam(entry.getKey(), entry.getValue());
+                        }
                     }
                     return uriBuilder.build();
                 })

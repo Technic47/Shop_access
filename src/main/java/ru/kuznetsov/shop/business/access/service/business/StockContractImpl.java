@@ -8,6 +8,7 @@ import ru.kuznetsov.shop.represent.contract.business.StockContract;
 import ru.kuznetsov.shop.represent.dto.StockDto;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.STOCK_MODULE;
 
@@ -29,18 +30,18 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
 
     @Override
     public Collection<StockDto> getAllByStoreId(Long storeId) {
-        return connector.sendGetRequest(getModuleName() + "/store", null, null, StockDto.class);
+        return connector.sendGetRequest(getModuleName() + "/store", new HashMap<>(), null, StockDto.class);
     }
 
     @Override
     public Collection<StockDto> getAllByProductId(Long productId) {
-        return connector.sendGetRequest(getModuleName() + "/product", null, null, StockDto.class);
+        return connector.sendGetRequest(getModuleName() + "/product", new HashMap<>(), null, StockDto.class);
     }
 
 
     @Override
     public StockDto create(StockDto entity) {
-        String operationId = connector.sendPostRequest(getModuleName(), null, entity, String.class).get(0);
+        String operationId = connector.sendPostRequest(getModuleName(), new HashMap<>(), entity, String.class).get(0);
         Long entityId = operationService.getEntityIdsByOperationId(operationId).get(0);
 
         return getById(entityId);
@@ -48,7 +49,7 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
 
     @Override
     public Collection<StockDto> createBatch(Collection<StockDto> entities) {
-        String operationId = connector.sendPostRequest(getModuleName() + "/batch", null, entities, String.class).get(0);
+        String operationId = connector.sendPostRequest(getModuleName() + "/batch", new HashMap<>(), entities, String.class).get(0);
         return operationService.getEntityIdsByOperationId(operationId)
                 .stream()
                 .map(this::getById)

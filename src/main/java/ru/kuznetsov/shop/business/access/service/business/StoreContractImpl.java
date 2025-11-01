@@ -36,6 +36,6 @@ public class StoreContractImpl extends AbstractContractImpl<StoreDto> implements
 
     @Override
     public List<StockDto> getAllStockByStoreId(Long storeId) {
-        return connector.sendGetRequest(getModuleName() + "/" + storeId + "/stock", null, null, StockDto.class);
+        return connector.sendGetRequest(getModuleName() + "/" + storeId + "/stock", new HashMap<>(), null, StockDto.class);
     }
 }

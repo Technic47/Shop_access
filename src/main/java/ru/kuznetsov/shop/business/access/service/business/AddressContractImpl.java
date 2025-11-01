@@ -6,9 +6,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.represent.contract.business.AddressContract;
 import ru.kuznetsov.shop.represent.dto.AddressDto;
 
-import java.util.Collection;
-import java.util.List;
-
 import static ru.kuznetsov.shop.business.access.common.ConstValues.ADDRESS_MODULE;
 
 @Service
@@ -21,10 +18,5 @@ public class AddressContractImpl extends AbstractContractImpl<AddressDto> implem
     @Override
     protected String getModuleName() {
         return ADDRESS_MODULE;
-    }
-
-    @Override
-    public Collection<AddressDto> createBatch(Collection<AddressDto> entities) {
-        return List.of();
     }
 }
