@@ -54,7 +54,7 @@ public class WebClientConnector {
                     return uriBuilder.build();
                 })
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
+                .bodyValue(body == null ? "" : body)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .ifModifiedSince(ZonedDateTime.now())
