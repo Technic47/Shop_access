@@ -7,8 +7,7 @@ import ru.kuznetsov.shop.business.access.service.OperationService;
 import ru.kuznetsov.shop.represent.contract.business.ProductContract;
 import ru.kuznetsov.shop.represent.dto.ProductDto;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.PRODUCT_MODULE;
 
@@ -17,14 +16,24 @@ public class ProductContractImpl extends AbstractContractImpl<ProductDto> implem
 
     private final OperationService operationService;
 
-    protected ProductContractImpl(@Qualifier("product") WebClient webClient, OperationService operationService1) {
+    protected ProductContractImpl(@Qualifier("product") WebClient webClient, OperationService operationService) {
         super(webClient);
-        this.operationService = operationService1;
+        this.operationService = operationService;
     }
 
     @Override
     protected String getModuleName() {
         return PRODUCT_MODULE;
+    }
+
+    @Override
+    public Collection<ProductDto> getAllByOwnerId(UUID ownerId) {
+        return connector.sendGetRequest(
+                getModuleName(),
+                Collections.singletonMap("ownerId", ownerId.toString()),
+                null,
+                ProductDto.class
+        );
     }
 
     @Override

@@ -6,9 +6,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.business.access.service.OperationService;
 import ru.kuznetsov.shop.represent.contract.business.StockContract;
 import ru.kuznetsov.shop.represent.dto.StockDto;
+import ru.kuznetsov.shop.represent.dto.StoreDto;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.STOCK_MODULE;
 
@@ -29,15 +29,14 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
     }
 
     @Override
-    public Collection<StockDto> getAllByStoreId(Long storeId) {
-        return connector.sendGetRequest(getModuleName() + "/store", new HashMap<>(), null, StockDto.class);
-    }
+    public Collection<StockDto> getAll(Long productId, Long storeId, UUID ownerId) {
+        Map<String, Object> params = new HashMap<>();
+        if (productId != null) params.put("productId", productId);
+        if (storeId != null) params.put("storeId", storeId);
+        if (ownerId != null) params.put("ownerId", ownerId);
 
-    @Override
-    public Collection<StockDto> getAllByProductId(Long productId) {
-        return connector.sendGetRequest(getModuleName() + "/product", new HashMap<>(), null, StockDto.class);
+        return connector.sendGetRequest(getModuleName(), params, null, StockDto.class);
     }
-
 
     @Override
     public StockDto create(StockDto entity) {

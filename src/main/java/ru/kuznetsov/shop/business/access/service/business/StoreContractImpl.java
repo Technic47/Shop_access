@@ -4,17 +4,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.represent.contract.business.StoreContract;
+import ru.kuznetsov.shop.represent.dto.ProductDto;
 import ru.kuznetsov.shop.represent.dto.StockDto;
 import ru.kuznetsov.shop.represent.dto.StoreDto;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.STORE_MODULE;
 
 @Service
 public class StoreContractImpl extends AbstractContractImpl<StoreDto> implements StoreContract {
+
     protected StoreContractImpl(@Qualifier("store") WebClient webClient) {
         super(webClient);
     }
@@ -25,11 +25,12 @@ public class StoreContractImpl extends AbstractContractImpl<StoreDto> implements
     }
 
     @Override
-    public List<StoreDto> getAll(Long id, String name, Long addressId) {
+    public List<StoreDto> getAll(Long id, String name, Long addressId, UUID ownerId) {
         Map<String, Object> params = new HashMap<>();
         if (id != null) params.put("id", id);
         if (name != null && !name.isEmpty()) params.put("name", name);
         if (addressId != null) params.put("addressId", addressId);
+        if (ownerId != null) params.put("ownerId", ownerId);
 
         return connector.sendGetRequest(getModuleName(), params, null, StoreDto.class);
     }
