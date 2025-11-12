@@ -8,6 +8,9 @@ public interface ConstValues {
     String STOCK_MODULE = "/stock";
     String STORE_MODULE = "/store";
     String OPERATION_MODULE = "/operation";
+    String ORDER_MODULE = "/order";
+    String ORDER_STATUS_MODULE = "/order/status";
+    String ORDER_BUCKET_MODULE = "/order/bucket";
 
     String ADDRESS_PORT = "9080";
     String PRODUCT_PORT = "9081";
@@ -15,4 +18,5 @@ public interface ConstValues {
     String STOCK_PORT = "9084";
     String STORE_PORT = "9083";
     String OPERATION_PORT = "9085";
+    String ORDER_PORT = "9085";
 }

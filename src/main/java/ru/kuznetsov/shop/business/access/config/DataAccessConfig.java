@@ -54,6 +54,12 @@ public class DataAccessConfig {
         return getWebClient(OPERATION_PORT);
     }
 
+    @Bean
+    @Qualifier("order")
+    public WebClient getOrderClient() {
+        return getWebClient(ORDER_PORT);
+    }
+
     private WebClient getWebClient(String port){
         return WebClient.builder()
                 .baseUrl(baseUrl + ":" + port)
