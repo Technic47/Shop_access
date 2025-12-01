@@ -6,9 +6,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.business.access.service.OperationService;
 import ru.kuznetsov.shop.represent.contract.business.StockContract;
 import ru.kuznetsov.shop.represent.dto.StockDto;
-import ru.kuznetsov.shop.represent.dto.StoreDto;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.STOCK_MODULE;
 
