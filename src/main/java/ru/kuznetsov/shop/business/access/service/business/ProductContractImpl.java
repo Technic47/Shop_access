@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.business.access.service.OperationService;
 import ru.kuznetsov.shop.represent.contract.business.ProductContract;
-import ru.kuznetsov.shop.represent.contract.business.StockContract;
 import ru.kuznetsov.shop.represent.dto.ProductCardDto;
 import ru.kuznetsov.shop.represent.dto.ProductDto;
 import ru.kuznetsov.shop.represent.dto.util.ProductCardPage;
@@ -18,12 +17,10 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.PRODUCT_MODUL
 public class ProductContractImpl extends AbstractContractImpl<ProductDto> implements ProductContract {
 
     private final OperationService operationService;
-    private final StockContract stockService;
 
-    protected ProductContractImpl(@Qualifier("product") WebClient webClient, OperationService operationService, StockContract stockService) {
+    protected ProductContractImpl(@Qualifier("product") WebClient webClient, OperationService operationService) {
         super(webClient);
         this.operationService = operationService;
-        this.stockService = stockService;
     }
 
     @Override

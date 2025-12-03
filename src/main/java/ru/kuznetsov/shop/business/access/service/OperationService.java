@@ -88,7 +88,7 @@ public class OperationService implements OperationContract {
 
     @Override
     public List<Long> getEntityIdsByOperationId(String operationId) {
-        return connector.sendPostRequest(OPERATION_MODULE + "/payload/" + operationId + "/wait",
+        return connector.sendGetRequest(OPERATION_MODULE + "/payload/" + operationId + "/wait",
                 null,
                 null,
                 Long.class);
