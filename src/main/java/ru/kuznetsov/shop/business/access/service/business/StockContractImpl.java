@@ -7,10 +7,7 @@ import ru.kuznetsov.shop.business.access.service.OperationService;
 import ru.kuznetsov.shop.represent.contract.business.StockContract;
 import ru.kuznetsov.shop.represent.dto.StockDto;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static ru.kuznetsov.shop.business.access.common.ConstValues.STOCK_MODULE;
 
@@ -38,6 +35,13 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
         if (ownerId != null) params.put("ownerId", ownerId);
 
         return connector.sendGetRequest(getModuleName(), params, null, StockDto.class);
+    }
+
+    @Override
+    public Collection<StockDto> getAllByReservationOrderId(Long orderId) {
+        Map<String, Object> params = Map.of("reservationOrderId",  orderId);
+
+        return connector.sendGetRequest(getModuleName() + "/reservation", params, null, StockDto.class);
     }
 
     @Override
