@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.business.access.service.business.AbstractContractImpl;
 import ru.kuznetsov.shop.represent.contract.order.OrderStatusContract;
 import ru.kuznetsov.shop.represent.dto.order.OrderStatusDto;
+import ru.kuznetsov.shop.represent.enums.OrderStatusType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -43,5 +44,15 @@ public class OrderStatusContractImpl extends AbstractContractImpl<OrderStatusDto
                 null,
                 OrderStatusDto.class
         ).get(0));
+    }
+
+    @Override
+    public Collection<OrderStatusDto> getAllByStatus(OrderStatusType status) {
+        return connector.sendGetRequest(
+                getModuleName(),
+                Collections.singletonMap("status", status),
+                null,
+                OrderStatusDto.class
+        );
     }
 }
