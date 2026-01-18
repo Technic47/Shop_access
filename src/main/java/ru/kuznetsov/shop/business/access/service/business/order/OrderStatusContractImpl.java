@@ -49,7 +49,7 @@ public class OrderStatusContractImpl extends AbstractContractImpl<OrderStatusDto
     @Override
     public Collection<OrderStatusDto> getAllByStatus(OrderStatusType status) {
         return connector.sendGetRequest(
-                getModuleName(),
+                getModuleName() + "/status",
                 Collections.singletonMap("status", status),
                 null,
                 OrderStatusDto.class

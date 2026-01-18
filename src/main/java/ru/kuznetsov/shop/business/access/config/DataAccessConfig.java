@@ -1,8 +1,12 @@
 package ru.kuznetsov.shop.business.access.config;
 
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -11,66 +15,98 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kuznetsov.shop.parameter.config.ParameterConfig;
-import ru.kuznetsov.shop.parameter.service.ParameterService;
-
-import static ru.kuznetsov.shop.parameter.common.ParameterKey.*;
 
 @Configuration
+@EnableDiscoveryClient
 @RequiredArgsConstructor
 @Import(ParameterConfig.class)
 @ComponentScan("ru.kuznetsov.shop.business.access")
 public class DataAccessConfig {
 
-    private final ParameterService parameterService;
+    private final EurekaClient discoveryClient;
 
-    @Value("${microservices.baseUrl}")
-    private String baseUrl;
+    @Value("${service.address.url}")
+    private String addressUrl;
+
+    @Value("${service.product.url}")
+    private String productUrl;
+
+    @Value("${service.product-category.url}")
+    private String productCategoryUrl;
+
+    @Value("${service.store.url}")
+    private String storeUrl;
+
+    @Value("${service.stock.url}")
+    private String stockUrl;
+
+    @Value("${service.order.url}")
+    private String orderUrl;
+
+    @Value("${service.operation.url}")
+    private String operationUrl;
 
     @Bean
+    @LoadBalanced
     @Qualifier("address")
     public WebClient getAddressClient() {
-        return getWebClient(parameterService.getParameterValueString(ADDRESS_PORT_PARAMETER));
+        return getWebClient(addressUrl);
     }
 
     @Bean
+    @LoadBalanced
     @Qualifier("product")
     public WebClient getProductClient() {
-        return getWebClient(parameterService.getParameterValueString(PRODUCT_PORT_PARAMETER));
+        return getWebClient(productUrl);
     }
 
     @Bean
+    @LoadBalanced
     @Qualifier("product-category")
     public WebClient getProductCategoryClient() {
-        return getWebClient(parameterService.getParameterValueString(PRODUCT_CATEGORY_PORT_PARAMETER));
+        return getWebClient(productCategoryUrl);
     }
 
     @Bean
+    @LoadBalanced
     @Qualifier("stock")
     public WebClient getStockClient() {
-        return getWebClient(parameterService.getParameterValueString(STOCK_PORT_PARAMETER));
+        return getWebClient(stockUrl);
     }
 
     @Bean
+    @LoadBalanced
     @Qualifier("store")
     public WebClient getStoreClient() {
-        return getWebClient(parameterService.getParameterValueString(STORE_PORT_PARAMETER));
+        return getWebClient(storeUrl);
     }
 
     @Bean
+    @LoadBalanced
     @Qualifier("operation")
     public WebClient getOperationClient() {
-        return getWebClient(parameterService.getParameterValueString(OPERATION_PORT_PARAMETER));
+        return getWebClient(operationUrl);
     }
 
     @Bean
+    @LoadBalanced
     @Qualifier("order")
     public WebClient getOrderClient() {
-        return getWebClient(parameterService.getParameterValueString(ORDER_PORT_PARAMETER));
+        return getWebClient(orderUrl);
     }
 
-    private WebClient getWebClient(String port) {
+//    private WebClient getWebClient(String port) {
+//        return WebClient.builder()
+//                .baseUrl(baseUrl + ":" + port)
+//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//                .build();
+//    }
+
+    private WebClient getWebClient(String url) {
+        InstanceInfo instance = discoveryClient.getNextServerFromEureka(url, false);
+
         return WebClient.builder()
-                .baseUrl(baseUrl + ":" + port)
+                .baseUrl(instance.getHomePageUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
