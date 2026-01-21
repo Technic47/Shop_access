@@ -17,8 +17,8 @@ public class StockContractImpl extends AbstractContractImpl<StockDto> implements
 
     private final OperationService operationService;
 
-    protected StockContractImpl(@Qualifier("stock") WebClient webClient, OperationService operationService) {
-        super(webClient);
+    protected StockContractImpl(@Qualifier("stock") WebClient.Builder webClientBuilder, OperationService operationService) {
+        super(webClientBuilder);
         this.operationService = operationService;
     }
 

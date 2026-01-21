@@ -18,8 +18,8 @@ public class ProductContractImpl extends AbstractContractImpl<ProductDto> implem
 
     private final OperationService operationService;
 
-    protected ProductContractImpl(@Qualifier("product") WebClient webClient, OperationService operationService) {
-        super(webClient);
+    protected ProductContractImpl(@Qualifier("product") WebClient.Builder webClientBuilder, OperationService operationService) {
+        super(webClientBuilder);
         this.operationService = operationService;
     }
 

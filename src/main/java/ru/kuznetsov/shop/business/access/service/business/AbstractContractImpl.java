@@ -15,10 +15,10 @@ public abstract class AbstractContractImpl<E extends AbstractDto> implements Abs
     private final Class<E> clazz;
     protected WebClientConnector connector;
 
-    protected AbstractContractImpl(WebClient webClient) {
+    protected AbstractContractImpl(WebClient.Builder webClientBuilder) {
         this.clazz = ((Class) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0]);
-        this.connector = new WebClientConnector(webClient);
+        this.connector = new WebClientConnector(webClientBuilder);
     }
 
     protected abstract String getModuleName();

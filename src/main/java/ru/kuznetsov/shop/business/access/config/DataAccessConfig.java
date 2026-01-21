@@ -1,12 +1,10 @@
 package ru.kuznetsov.shop.business.access.config;
 
-import com.netflix.appinfo.InstanceInfo;
-import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.kuznetsov.shop.business.access.config.web.*;
 import ru.kuznetsov.shop.parameter.config.ParameterConfig;
 
 @Configuration
@@ -21,93 +20,69 @@ import ru.kuznetsov.shop.parameter.config.ParameterConfig;
 @RequiredArgsConstructor
 @Import(ParameterConfig.class)
 @ComponentScan("ru.kuznetsov.shop.business.access")
+@LoadBalancerClients({
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "address", configuration = AddressServiceInstanceSupplierConfiguration.class),
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "product", configuration = ProductServiceInstanceSupplierConfiguration.class),
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "product-category", configuration = ProductCategoryServiceInstanceSupplierConfiguration.class),
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "store", configuration = StoreServiceInstanceSupplierConfiguration.class),
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "stock", configuration = StockServiceInstanceSupplierConfiguration.class),
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "order", configuration = OrderServiceInstanceSupplierConfiguration.class),
+        @org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient(name = "operation", configuration = OperationServiceInstanceSupplierConfiguration.class)
+})
 public class DataAccessConfig {
-
-    private final EurekaClient discoveryClient;
-
-    @Value("${service.address.url}")
-    private String addressUrl;
-
-    @Value("${service.product.url}")
-    private String productUrl;
-
-    @Value("${service.product-category.url}")
-    private String productCategoryUrl;
-
-    @Value("${service.store.url}")
-    private String storeUrl;
-
-    @Value("${service.stock.url}")
-    private String stockUrl;
-
-    @Value("${service.order.url}")
-    private String orderUrl;
-
-    @Value("${service.operation.url}")
-    private String operationUrl;
 
     @Bean
     @LoadBalanced
     @Qualifier("address")
-    public WebClient getAddressClient() {
-        return getWebClient(addressUrl);
+    public WebClient.Builder getAddressClient() {
+        return getWebClientBuilder("http://address/");
     }
 
     @Bean
     @LoadBalanced
     @Qualifier("product")
-    public WebClient getProductClient() {
-        return getWebClient(productUrl);
+    public WebClient.Builder getProductClient() {
+        return getWebClientBuilder("http://product/");
     }
 
     @Bean
     @LoadBalanced
     @Qualifier("product-category")
-    public WebClient getProductCategoryClient() {
-        return getWebClient(productCategoryUrl);
-    }
-
-    @Bean
-    @LoadBalanced
-    @Qualifier("stock")
-    public WebClient getStockClient() {
-        return getWebClient(stockUrl);
+    public WebClient.Builder getProductCategoryClient() {
+        return getWebClientBuilder("http://product-category/");
     }
 
     @Bean
     @LoadBalanced
     @Qualifier("store")
-    public WebClient getStoreClient() {
-        return getWebClient(storeUrl);
+    public WebClient.Builder getStoreClient() {
+        return getWebClientBuilder("http://store/");
     }
 
     @Bean
     @LoadBalanced
-    @Qualifier("operation")
-    public WebClient getOperationClient() {
-        return getWebClient(operationUrl);
+    @Qualifier("stock")
+    public WebClient.Builder getStockClient() {
+        return getWebClientBuilder("http://stock/");
     }
 
     @Bean
     @LoadBalanced
     @Qualifier("order")
-    public WebClient getOrderClient() {
-        return getWebClient(orderUrl);
+    public WebClient.Builder getOrderClient() {
+        return getWebClientBuilder("http://order/");
     }
 
-//    private WebClient getWebClient(String port) {
-//        return WebClient.builder()
-//                .baseUrl(baseUrl + ":" + port)
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .build();
-//    }
+    @Bean
+    @LoadBalanced
+    @Qualifier("operation")
+    public WebClient.Builder getOperationClient() {
+        return getWebClientBuilder("http://operation/");
+    }
 
-    private WebClient getWebClient(String url) {
-        InstanceInfo instance = discoveryClient.getNextServerFromEureka(url, false);
-
+    public WebClient.Builder getWebClientBuilder(String baseUrl) {
         return WebClient.builder()
-                .baseUrl(instance.getHomePageUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+                .baseUrl(baseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 }

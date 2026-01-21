@@ -26,8 +26,8 @@ public class WebClientConnector {
 
     private final WebClient webClient;
 
-    public WebClientConnector(WebClient webClient) {
-        this.webClient = webClient;
+    public WebClientConnector(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.build();
     }
 
     public <T> List<T> sendGetRequest(String uri, Map<String, ?> queryParams, Object body, Class<T> clazz) {

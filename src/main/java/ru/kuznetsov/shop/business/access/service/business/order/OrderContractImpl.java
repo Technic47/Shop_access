@@ -20,8 +20,8 @@ public class OrderContractImpl extends AbstractContractImpl<OrderDto> implements
 
     private final OperationService operationService;
 
-    protected OrderContractImpl(@Qualifier("order") WebClient webClient, OperationService operationService) {
-        super(webClient);
+    protected OrderContractImpl(@Qualifier("order") WebClient.Builder webClientBuilder, OperationService operationService) {
+        super(webClientBuilder);
         this.operationService = operationService;
     }
 

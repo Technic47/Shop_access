@@ -10,8 +10,9 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.PRODUCT_CATEG
 
 @Service
 public class ProductCategoryContractImpl extends AbstractContractImpl<ProductCategoryDto> implements ProductCategoryContract {
-    protected ProductCategoryContractImpl(@Qualifier("product-category") WebClient webClient) {
-        super(webClient);
+
+    protected ProductCategoryContractImpl(@Qualifier("product-category") WebClient.Builder webClientBuilder) {
+        super(webClientBuilder);
     }
 
     @Override

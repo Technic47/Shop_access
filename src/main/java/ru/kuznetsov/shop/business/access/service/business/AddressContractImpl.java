@@ -11,8 +11,8 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.ADDRESS_MODUL
 @Service
 public class AddressContractImpl extends AbstractContractImpl<AddressDto> implements AddressContract {
 
-    protected AddressContractImpl(@Qualifier("address") WebClient webClient) {
-        super(webClient);
+    protected AddressContractImpl(@Qualifier("address") WebClient.Builder webClientBuilder) {
+        super(webClientBuilder);
     }
 
     @Override

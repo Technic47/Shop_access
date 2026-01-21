@@ -16,8 +16,8 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.STORE_MODULE;
 @Service
 public class StoreContractImpl extends AbstractContractImpl<StoreDto> implements StoreContract {
 
-    protected StoreContractImpl(@Qualifier("store") WebClient webClient) {
-        super(webClient);
+    protected StoreContractImpl(@Qualifier("store") WebClient.Builder webClientBuilder) {
+        super(webClientBuilder);
     }
 
     @Override

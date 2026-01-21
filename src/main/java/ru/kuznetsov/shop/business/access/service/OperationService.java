@@ -20,8 +20,8 @@ public class OperationService implements OperationContract {
 
     protected final WebClientConnector connector;
 
-    public OperationService(@Qualifier("operation") WebClient webclient) {
-        this.connector = new WebClientConnector(webclient);
+    public OperationService(@Qualifier("operation") WebClient.Builder webClientBuilder) {
+        this.connector = new WebClientConnector(webClientBuilder);
     }
 
     @Override

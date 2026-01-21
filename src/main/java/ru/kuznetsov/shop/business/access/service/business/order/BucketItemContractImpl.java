@@ -16,8 +16,8 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.ORDER_BUCKET_
 @Service
 public class BucketItemContractImpl extends AbstractContractImpl<BucketItemDto> implements BucketItemContract {
 
-    protected BucketItemContractImpl(@Qualifier("order") WebClient webClient) {
-        super(webClient);
+    protected BucketItemContractImpl(@Qualifier("order") WebClient.Builder webClientBuilder) {
+        super(webClientBuilder);
     }
 
     @Override

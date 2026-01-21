@@ -17,8 +17,8 @@ import static ru.kuznetsov.shop.business.access.common.ConstValues.ORDER_STATUS_
 @Service
 public class OrderStatusContractImpl extends AbstractContractImpl<OrderStatusDto> implements OrderStatusContract {
 
-    protected OrderStatusContractImpl(@Qualifier("order") WebClient webClient) {
-        super(webClient);
+    protected OrderStatusContractImpl(@Qualifier("order") WebClient.Builder webClientBuilder) {
+        super(webClientBuilder);
     }
 
     @Override
